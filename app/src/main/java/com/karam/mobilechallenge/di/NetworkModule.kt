@@ -1,6 +1,7 @@
 package com.karam.mobilechallenge.di
 
 import com.karam.mobilechallenge.BuildConfig
+import com.karam.mobilechallenge.Const
 import com.karam.mobilechallenge.data.api.CategoriesApi
 import okhttp3.OkHttpClient
 import okhttp3.logging.HttpLoggingInterceptor
@@ -22,7 +23,7 @@ val networkModule = module {
         val retrofitBuilder = Retrofit.Builder()
             .baseUrl(BuildConfig.BASE_URL)
             .addConverterFactory(GsonConverterFactory.create())
-            .client(okHttpClient) // Add the OkHttpClient
+            .client(okHttpClient)
             .build()
 
         retrofitBuilder.create(CategoriesApi::class.java)

@@ -16,5 +16,6 @@ data class CategoryItems(
     @SerializedName("maxBudget")
     val maxBudget: Int,
     @SerializedName("avgBudget")
-    val avgBudget: Int
+    val avgBudget: Int,
+    var isSelected: Boolean = false // Track selection status
 )

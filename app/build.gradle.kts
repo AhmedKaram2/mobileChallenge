@@ -20,7 +20,7 @@ android {
         }
         // Default Config for API
         buildConfigField("String", "BASE_URL",
-            "https://swensonhe-dev-challenge.s3.us-west-2.amazonaws.com")
+            "\"https://swensonhe-dev-challenge.s3.us-west-2.amazonaws.com\"")
     }
 
     buildTypes {
@@ -77,6 +77,10 @@ dependencies {
     implementation(libs.logging.interceptor)
     // Koin
     implementation (libs.koin.android)
-
+    //Coil
+    implementation(libs.coil.compose)
+    // Navigator
+    implementation(libs.androidx.compose.material3.adaptive.navigation.suite)
+    implementation(libs.androidx.compose.material3.adaptive.navigation)
 
 }
