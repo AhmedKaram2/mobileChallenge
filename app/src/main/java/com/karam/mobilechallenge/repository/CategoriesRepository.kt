@@ -14,7 +14,7 @@ class CategoriesRepository (private val categoriesApi: CategoriesApi
         return categoriesApi.getCategories().body()
     }
 
-    suspend fun getCategoriesItems(categoryId:Int)  : CategoryItems?
+    suspend fun getCategoriesItems(categoryId:Int)  : List<CategoryItems>?
     {
         return categoriesApi.getCategoriesItems(
            categoryId= categoryId

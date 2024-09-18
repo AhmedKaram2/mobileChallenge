@@ -13,7 +13,7 @@ class CategoriesUseCase(private val categoriesRepository: CategoriesRepository) 
     }
 
     // Fetch categories items from the repository that call the API
-    suspend fun fetchCategoriesItems(categoryId:Int) : CategoryItems?
+    suspend fun fetchCategoriesItems(categoryId:Int) : List<CategoryItems>?
     {
         return categoriesRepository.getCategoriesItems(categoryId)
     }

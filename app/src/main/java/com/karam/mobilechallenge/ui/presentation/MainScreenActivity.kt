@@ -1,4 +1,3 @@
-@file:OptIn(ExperimentalMaterial3AdaptiveApi::class)
 
 package com.karam.mobilechallenge.ui.presentation
 
@@ -6,58 +5,65 @@ import android.os.Bundle
 import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
 import androidx.compose.foundation.layout.PaddingValues
-import androidx.compose.foundation.layout.fillMaxSize
-import androidx.compose.material3.adaptive.ExperimentalMaterial3AdaptiveApi
-import androidx.compose.material3.adaptive.navigation.NavigableListDetailPaneScaffold
-import androidx.compose.material3.adaptive.navigation.rememberListDetailPaneScaffoldNavigator
 import androidx.compose.runtime.Composable
-import androidx.compose.ui.Modifier
-import androidx.compose.ui.unit.dp
+import androidx.navigation.compose.NavHost
+import androidx.navigation.compose.composable
+import androidx.navigation.compose.rememberNavController
+import com.karam.mobilechallenge.Const
+import com.karam.mobilechallenge.data.model.Category
+import com.karam.mobilechallenge.ui.navigation.Screens
+import com.karam.mobilechallenge.ui.theme.AppSpacing
 import com.karam.mobilechallenge.ui.theme.MobileChallengeTheme
 import com.karam.mobilechallenge.ui.viewmodel.CategoriesViewModel
+import com.karam.mobilechallenge.ui.viewmodel.CategoryItemsViewModel
 import org.koin.androidx.viewmodel.ext.android.viewModel
 
 class MainScreenActivity :ComponentActivity(){
     private val categoriesViewModel: CategoriesViewModel by viewModel()
+    private val categoryItemsViewModel: CategoryItemsViewModel by viewModel()
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
 
         setContent {
             MobileChallengeTheme {
-
-                HandleCategoriesScreenNavigation(
-                    modifier = Modifier.fillMaxSize()
+                EventBuilderNavigation(
+                    categoriesViewModel = categoriesViewModel,
+                    categoryItemsViewModel = categoryItemsViewModel
                 )
-//                CategoriesListScreen(
-//                    viewModel = categoriesViewModel,
-//                    innerPadding = PaddingValues(16.dp)
-//                )
             }
         }
     }
 
     @Composable
-    fun HandleCategoriesScreenNavigation(modifier: Modifier){
-        val navigator = rememberListDetailPaneScaffoldNavigator<Any>()
-        NavigableListDetailPaneScaffold(
-            modifier = modifier,
-            navigator = navigator,
-            listPane = {
+    fun EventBuilderNavigation(
+        categoriesViewModel: CategoriesViewModel,
+        categoryItemsViewModel: CategoryItemsViewModel
+    ) {
+        val navController = rememberNavController()
+
+        NavHost(navController, startDestination = Screens.CategoriesListScreen.route) {
+            composable(Screens.CategoriesListScreen.route) {
                 CategoriesListScreen(
                     viewModel = categoriesViewModel,
-                    innerPadding = PaddingValues(16.dp),
-                    navigator = navigator
-                )
-            },
-            detailPane = {
-                val content = navigator.currentDestination?.content?.toString() ?: "Select an option"
-                ItemsListScreen(
-                    navigator,
-                    content
+                    innerPadding = PaddingValues(AppSpacing.medium),
+                    onCategorySelected = { category ->
+                        navController.currentBackStackEntry?.savedStateHandle?.set(Const.CATEGORY, category)
+                        navController.navigate(Screens.CategoryItemsListScreen.route)
+                    }
                 )
             }
-        )
-    }
 
+            composable(Screens.CategoryItemsListScreen.route) {
+                val category = navController.previousBackStackEntry?.savedStateHandle?.get<Category>(Const.CATEGORY)
+                category?.let {
+                    CategoryItemsListScreen(
+                        viewModel = categoryItemsViewModel,
+                        category = it,
+                        onBackClick = { navController.popBackStack() }
+                    )
+                }
+            }
+        }
+    }
 }

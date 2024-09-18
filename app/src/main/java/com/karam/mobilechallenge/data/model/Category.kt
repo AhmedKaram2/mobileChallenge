@@ -1,7 +1,10 @@
 package com.karam.mobilechallenge.data.model
 
+import android.os.Parcelable
 import com.google.gson.annotations.SerializedName
+import kotlinx.parcelize.Parcelize
 
+@Parcelize
 data class Category(
     @SerializedName("id")
     val id:Int ,
@@ -9,5 +12,4 @@ data class Category(
     val title:String,
     @SerializedName("image")
     val image:String,
-    var isSelected: Boolean = false // Track selection status
-)
+): Parcelable

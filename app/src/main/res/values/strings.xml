@@ -1,3 +1,11 @@
 <resources>
     <string name="app_name">MobileChallenge</string>
+    <string name="back">Back</string>
+    <string name="no_items_available">No items available.</string>
+    <string name="total_price">Total Price: $%1$s</string>
+    <string name="selected">Selected</string>
+    <string name="add_item">Add item</string>
+    <string name="no_events_available">No Events available</string>
+    <string name="add_to_your_event_to_view_our_cost_estimate">Add to your event to view our cost estimate.</string>
+    <string name="save">Save</string>
 </resources>

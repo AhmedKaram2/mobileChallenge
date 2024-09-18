@@ -17,7 +17,7 @@ import retrofit2.HttpException
 
 class CategoriesViewModel(
     private val categoryUseCase: CategoriesUseCase
-) : ViewModel() {
+    ) : ViewModel() {
 
     private val categoriesIntent = Channel<CategoriesIntent>(Channel.UNLIMITED)
     private val _categorySideEffects = Channel<CategorySideEffects>(Channel.UNLIMITED)
@@ -25,7 +25,6 @@ class CategoriesViewModel(
 
     private val _state = MutableStateFlow<CategoriesState>(CategoriesState.Idle)
     val state: StateFlow<CategoriesState> get() = _state
-    private var categoryID = 0
 
     init {
         handleIntent()
@@ -48,9 +47,8 @@ class CategoriesViewModel(
             categoriesIntent.consumeAsFlow().collect { intent ->
                 when (intent) {
                     is CategoriesIntent.FetchCategoriesFromAPI -> handleFetchCategoriesFromAPI()
-                    is CategoriesIntent.FetchCategoriesItems -> handleFetchCategoriesItemsFromAPI()
                     is CategoriesIntent.OpenEventsItemsScreen -> runSideEffect(CategorySideEffects
-                        .OpenCategoriesItemsScreen(intent.categoryId))
+                        .OpenCategoriesItemsScreen(intent.category))
                 }
             }
         }
@@ -60,12 +58,7 @@ class CategoriesViewModel(
             // show loading
             _state.value = CategoriesState.Loading
             // fetch data from api
-            try {
-                fetchCategoriesFromAPI()
-
-            }catch (e :Exception){
-                _state.value = CategoriesState.Error(e.message ?: "Error fetching data")
-            }
+            fetchCategoriesFromAPI()
         }
     }
 
@@ -82,15 +75,4 @@ class CategoriesViewModel(
             }
         }
     }
-
-    private fun handleFetchCategoriesItemsFromAPI() {
-        viewModelScope.launch(Dispatchers.IO){
-            // show loading
-            _state.value = CategoriesState.Loading
-            // fetch data from api
-            
-        }
-    }
-
-
 }
