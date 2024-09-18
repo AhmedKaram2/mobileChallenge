@@ -49,6 +49,7 @@ class CategoriesViewModel(
                     is CategoriesIntent.FetchCategoriesFromAPI -> handleFetchCategoriesFromAPI()
                     is CategoriesIntent.OpenEventsItemsScreen -> runSideEffect(CategorySideEffects
                         .OpenCategoriesItemsScreen(intent.category))
+                    is CategoriesIntent.OpenEventsSavedScreen -> runSideEffect(CategorySideEffects.OpenSavedEventsScreen())
                 }
             }
         }

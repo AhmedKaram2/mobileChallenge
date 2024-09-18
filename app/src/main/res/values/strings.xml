@@ -8,4 +8,5 @@
     <string name="no_events_available">No Events available</string>
     <string name="add_to_your_event_to_view_our_cost_estimate">Add to your event to view our cost estimate.</string>
     <string name="save">Save</string>
+    <string name="event_builder">Event Builder</string>
 </resources>

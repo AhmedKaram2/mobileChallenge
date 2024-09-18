@@ -1,4 +1,3 @@
-
 package com.karam.mobilechallenge.ui.presentation
 
 
@@ -15,6 +14,7 @@ import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.lazy.grid.GridCells
 import androidx.compose.foundation.lazy.grid.LazyVerticalGrid
 import androidx.compose.foundation.lazy.grid.items
+import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material3.Button
 import androidx.compose.material3.Card
 import androidx.compose.material3.CardDefaults
@@ -27,8 +27,11 @@ import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.res.stringResource
+import androidx.compose.ui.text.font.FontWeight
+import androidx.compose.ui.unit.dp
 import coil.compose.rememberAsyncImagePainter
 import com.karam.mobilechallenge.R
 import com.karam.mobilechallenge.contract.intent.CategoriesIntent
@@ -43,24 +46,23 @@ import kotlinx.coroutines.flow.collectLatest
 fun CategoriesListScreen(
     viewModel: CategoriesViewModel,
     innerPadding: PaddingValues,
-    onCategorySelected: (Category) -> Unit
+    totalPrice: Double,
+    onCategorySelected: (Category) -> Unit,
+    onSavedEventsClick: () -> Unit
 ) {
-
     val state by viewModel.state.collectAsState()
+
     LaunchedEffect(viewModel.categorySideEffects) {
         viewModel.categorySideEffects.collectLatest {
-            when (it){
-                is CategorySideEffects.OpenCategoriesItemsScreen -> {
-                   onCategorySelected(it.category)
-                }
+            when (it) {
+                is CategorySideEffects.OpenCategoriesItemsScreen -> onCategorySelected(it.category)
+                is CategorySideEffects.OpenSavedEventsScreen -> onSavedEventsClick()
             }
         }
     }
 
     LaunchedEffect(Unit) {
-        viewModel.setIntent(
-            CategoriesIntent.FetchCategoriesFromAPI()
-        )
+        viewModel.setIntent(CategoriesIntent.FetchCategoriesFromAPI())
     }
 
     Column(
@@ -68,28 +70,37 @@ fun CategoriesListScreen(
             .fillMaxSize()
             .padding(innerPadding)
             .padding(AppSpacing.medium),
-            verticalArrangement = Arrangement.Center, // Center vertically
-            horizontalAlignment = Alignment.CenterHorizontally // Center horizontally
-
+        verticalArrangement = Arrangement.Center,
+        horizontalAlignment = Alignment.CenterHorizontally
     ) {
-        AddEventHintText()
+
+        AddEventHintText(
+            text = stringResource(R.string.event_builder), FontWeight.Bold
+        )
+
+        AddEventHintText(
+            stringResource(R.string.add_to_your_event_to_view_our_cost_estimate), FontWeight.Normal
+        )
+
+        // Display the total price
+        TotalPriceText(totalPrice = totalPrice)
 
         when (state) {
             is CategoriesState.Loading -> LoadingIndicator()
             is CategoriesState.CategoriesLoaded -> {
-                (state as CategoriesState.CategoriesLoaded).categories?.let { category ->
-                    if (category.isEmpty()) {
+                (state as CategoriesState.CategoriesLoaded).categories?.let { categories ->
+                    if (categories.isEmpty()) {
                         Text(stringResource(R.string.no_events_available))
                     } else {
                         CategoriesGrid(
                             modifier = Modifier
                                 .fillMaxWidth()
                                 .weight(1f),
-                            category
-                        ,viewModel)
+                            categories = categories,
+                            viewModel = viewModel
+                        )
                     }
                 }
-
             }
 
             is CategoriesState.Error -> ErrorText((state as CategoriesState.Error).message)
@@ -100,17 +111,18 @@ fun CategoriesListScreen(
         SaveButton(
             Modifier
                 .fillMaxWidth()
-                .padding(top = AppSpacing.medium)
+                .padding(top = AppSpacing.medium),
+            onSavedEventsClick
         )
     }
 }
 
 @Composable
-fun AddEventHintText() {
+fun AddEventHintText(text: String, fontWeight: FontWeight) {
     Text(
-        text = stringResource(R.string.add_to_your_event_to_view_our_cost_estimate),
-        style = MaterialTheme.typography.titleLarge,
-        color = MaterialTheme.colorScheme.onSurface.copy(alpha = 0.6f),
+        text = text,
+        style = MaterialTheme.typography.titleLarge.copy(fontWeight = fontWeight),
+        color = Color.Black,
         modifier = Modifier
             .padding(bottom = AppSpacing.medium)
 
@@ -130,7 +142,7 @@ fun LoadingIndicator() {
 
 @Composable
 fun CategoriesGrid(
-    modifier: Modifier, categories: List<Category>? , viewModel: CategoriesViewModel
+    modifier: Modifier, categories: List<Category>?, viewModel: CategoriesViewModel
 ) {
     LazyVerticalGrid(
         columns = GridCells.Fixed(2),
@@ -139,7 +151,8 @@ fun CategoriesGrid(
         modifier = modifier
     ) {
         items(categories ?: emptyList()) { category ->
-            CategoryCard(category,
+            CategoryCard(
+                category,
                 viewModel = viewModel
             )
         }
@@ -155,17 +168,18 @@ fun ErrorText(message: String) {
 }
 
 @Composable
-fun SaveButton(modifier: Modifier) {
+fun SaveButton(modifier: Modifier, onSavedEventsClick: () -> Unit) {
     Button(
-        onClick = { /* Handle save action */ },
-        modifier = modifier
+        onClick = { onSavedEventsClick() },
+        modifier = modifier,
+        shape = RoundedCornerShape(AppSpacing.small)
     ) {
         Text(stringResource(R.string.save))
     }
 }
 
 @Composable
-fun CategoryCard(category: Category , viewModel: CategoriesViewModel ) {
+fun CategoryCard(category: Category, viewModel: CategoriesViewModel) {
     Card(
         modifier = Modifier
             .fillMaxWidth()

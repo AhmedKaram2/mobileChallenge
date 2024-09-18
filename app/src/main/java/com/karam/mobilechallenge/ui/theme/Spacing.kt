@@ -8,4 +8,5 @@ object AppSpacing {
     val medium = 16.dp
     val large = 24.dp
     val extraLarge = 32.dp
+    val savedCardSize = 200.dp
 }

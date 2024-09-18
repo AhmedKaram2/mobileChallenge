@@ -1,8 +1,8 @@
-
 package com.karam.mobilechallenge.ui.presentation
 
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
+import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
@@ -30,14 +30,13 @@ import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
-import androidx.compose.runtime.mutableStateOf
-import androidx.compose.runtime.remember
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
+import androidx.compose.ui.text.font.FontWeight
 import coil.compose.rememberAsyncImagePainter
 import com.karam.mobilechallenge.R
 import com.karam.mobilechallenge.contract.intent.CategoryItemsIntent
@@ -49,30 +48,30 @@ import com.karam.mobilechallenge.ui.theme.Typography
 import com.karam.mobilechallenge.ui.viewmodel.CategoryItemsViewModel
 
 @OptIn(ExperimentalMaterial3Api::class)
+
 @Composable
 fun CategoryItemsListScreen(
     viewModel: CategoryItemsViewModel,
     category: Category,
+    totalPrice: Double,
+    selectedItems: List<CategoryItems>,
+    onSelectedItemsChange: (List<CategoryItems>) -> Unit,
     onBackClick: () -> Unit
 ) {
     val state by viewModel.state.collectAsState()
 
-    // Use MutableState for the selected items list
-    val selectedItems = remember { mutableStateOf(listOf<CategoryItems>()) }
-
-    // Calculate total price based on selected items
-    val totalPrice = selectedItems.value.sumOf { it.avgBudget.toDouble() } // Assuming price is a string or number
-
     LaunchedEffect(key1 = category) {
         viewModel.setIntent(CategoryItemsIntent.FetchCategoryItemsFromAPI(category.id))
     }
+
 
     Scaffold(
         topBar = {
             TopAppBar(
                 navigationIcon = {
                     IconButton(onClick = onBackClick) {
-                        Icon(Icons.Default.ArrowBack,
+                        Icon(
+                            Icons.Default.ArrowBack,
                             contentDescription = stringResource(R.string.back)
                         )
                     }
@@ -101,21 +100,25 @@ fun CategoryItemsListScreen(
                 .fillMaxSize()
                 .padding(innerPadding)
                 .background(Color.White),
-                verticalArrangement = Arrangement.Center, // Center vertically
-                horizontalAlignment = Alignment.CenterHorizontally // Center horizontally
+            verticalArrangement = Arrangement.Center, // Center vertically
+            horizontalAlignment = Alignment.CenterHorizontally // Center horizontally
 
         ) {
+
             // AddEventHintText composable
-            AddEventHintText()
+            AddEventHintText(
+                stringResource(
+                    R.string.add_to_your_event_to_view_our_cost_estimate
+                ), FontWeight.Normal
+            )
 
             // Display total price
-            TotalPriceText(totalPrice)
+            TotalPriceText(totalPrice = totalPrice)
 
             when (state) {
                 is CategoryItemsState.Loading -> LoadingIndicator()
                 is CategoryItemsState.CategoryItemsLoaded -> {
-
-                    (state as CategoryItemsState.CategoryItemsLoaded).items?.let {items->
+                    (state as CategoryItemsState.CategoryItemsLoaded).items?.let { items ->
                         if (items.isEmpty()) {
                             Text(stringResource(R.string.no_items_available))
                         } else {
@@ -124,16 +127,12 @@ fun CategoryItemsListScreen(
                                     .fillMaxWidth()
                                     .weight(1f),
                                 items = items,
-                                selectedItems = selectedItems.value,
+                                selectedItems = selectedItems,
                                 onItemSelected = { item ->
-                                    // Update the selectedItems list by copying the existing list and updating
-                                    val newList = selectedItems.value.toMutableList()
-                                    if (newList.contains(item)) {
-                                        newList.remove(item) // Unselect the item
-                                    } else {
-                                        newList.add(item) // Select the item
-                                    }
-                                    selectedItems.value = newList // Update the state
+                                    val newList = selectedItems.toMutableList()
+                                    if (newList.contains(item)) newList.remove(item)
+                                    else newList.add(item)
+                                    onSelectedItemsChange(newList)
                                 }
                             )
                         }
@@ -141,7 +140,7 @@ fun CategoryItemsListScreen(
                 }
 
                 is CategoryItemsState.Error -> ErrorText((state as CategoryItemsState.Error).message)
-                else -> { /* Handle other states if needed */ }
+                CategoryItemsState.Idle -> LoadingIndicator()
             }
         }
     }
@@ -241,3 +240,9 @@ fun CategoryItemCard(
         }
     }
 }
+
+
+
+
+
+
