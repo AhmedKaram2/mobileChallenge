@@ -1,9 +1,8 @@
 package com.karam.mobilechallenge.data.model
 
-import android.media.Image
 import com.google.gson.annotations.SerializedName
 
-data class CategoryItems(
+data class EventsItems(
 
     @SerializedName("id")
     val id: Int,

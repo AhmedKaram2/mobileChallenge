@@ -21,7 +21,7 @@ import coil.compose.rememberAsyncImagePainter
 import com.karam.mobilechallenge.R
 import com.karam.mobilechallenge.ui.contract.intent.EventsItemsIntent
 import com.karam.mobilechallenge.data.model.Category
-import com.karam.mobilechallenge.data.model.CategoryItems
+import com.karam.mobilechallenge.data.model.EventsItems
 import com.karam.mobilechallenge.ui.presentation.categoriesListScreen.*
 import com.karam.mobilechallenge.ui.theme.AppSpacing
 import com.karam.mobilechallenge.ui.theme.Typography
@@ -60,8 +60,11 @@ fun EventsItemsListScreen(
                 .padding(innerPadding)
                 .background(Color.White),
             contentAlignment = Alignment.Center
+
         ) {
             Column(
+                modifier = Modifier
+                    .fillMaxSize(),
                 verticalArrangement = Arrangement.Center,
                 horizontalAlignment = Alignment.CenterHorizontally
             ) {
@@ -121,7 +124,7 @@ fun TotalPriceText(totalPrice: Double) {
 @Composable
 fun ItemsGrid(
     modifier: Modifier,
-    items: List<CategoryItems>,
+    items: List<EventsItems>,
     onItemCheckClick: (Int) -> Unit
 ) {
     LazyVerticalGrid(
@@ -149,7 +152,7 @@ fun ItemsGrid(
  */
 @Composable
 fun CategoryItemCard(
-    item: CategoryItems,
+    item: EventsItems,
     onItemCheckClick: () -> Unit
 ) {
     Card(

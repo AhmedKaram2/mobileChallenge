@@ -12,13 +12,6 @@ import com.karam.mobilechallenge.utils.StringManager
 import kotlinx.coroutines.flow.*
 import kotlinx.coroutines.launch
 
-/**
- * ViewModel for the categories list screen.
- * Manages the business logic and state for displaying categories and handling user interactions.
- *
- * @property categoriesRepository Repository for fetching and managing category data.
- * @property stringManager Utility for managing string resources.
- */
 class CategoriesViewModel(
     private val categoriesRepository: CategoriesRepository,
     private val stringManager: StringManager
@@ -30,20 +23,18 @@ class CategoriesViewModel(
     private val _isLoading = MutableStateFlow(false)
     private val _error = MutableStateFlow<String?>(null)
 
-    /**
-     * Combined state flow representing the current state of the categories screen.
-     * Combines categories, total price, loading state, and error state.
-     */
     val viewState: StateFlow<CategoriesState> = combine(
         categoriesRepository.categoriesFlow,
         categoriesRepository.totalPriceFlow,
+        categoriesRepository.selectedItemsCountFlow,
         _isLoading,
         _error
-    ) { categories, totalPrice, isLoading, error ->
+    ) { categories, totalPrice, selectedItemsCounts, isLoading, error ->
         CategoriesState(
             isLoading = isLoading,
             categories = categories,
             totalPrice = totalPrice,
+            selectedItemsCounts = selectedItemsCounts,
             error = error
         )
     }.stateIn(
@@ -56,11 +47,6 @@ class CategoriesViewModel(
         fetchCategories()
     }
 
-    /**
-     * Handles intents (user actions) from the UI.
-     *
-     * @param intent The intent representing the user action.
-     */
     fun handleIntent(intent: CategoriesIntent) {
         when (intent) {
             is CategoriesIntent.FetchCategoriesFromAPI -> fetchCategories()
@@ -69,10 +55,6 @@ class CategoriesViewModel(
         }
     }
 
-    /**
-     * Fetches categories from the repository and updates the state.
-     * Handles loading state and errors.
-     */
     private fun fetchCategories() {
         viewModelScope.launch {
             try {
@@ -87,27 +69,12 @@ class CategoriesViewModel(
         }
     }
 
-    /**
-     * Get The count of selected items for a specific category.
-     */
-    fun getCategoriesSelectedItemsCount(categoryId: Int): Int {
-        return categoriesRepository.getCategoriesSelectedItemsCount(categoryId)
-    }
-
-    /**
-     * Emits a side effect to open the events items screen for a specific category.
-     *
-     * @param category The category to open the events items screen for.
-     */
     private fun openEventsItemsScreen(category: Category) {
         viewModelScope.launch {
             _categorySideEffects.emit(CategorySideEffects.OpenCategoriesItemsScreen(category))
         }
     }
 
-    /**
-     * Emits a side effect to open the saved events screen.
-     */
     private fun openEventsSavedScreen() {
         viewModelScope.launch {
             _categorySideEffects.emit(CategorySideEffects.OpenSavedEventsScreen())

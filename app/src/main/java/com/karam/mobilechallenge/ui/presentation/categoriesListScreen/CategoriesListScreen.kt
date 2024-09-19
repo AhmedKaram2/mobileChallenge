@@ -17,7 +17,6 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.layout.ContentScale
-import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.sp
@@ -29,15 +28,6 @@ import com.karam.mobilechallenge.data.model.Category
 import com.karam.mobilechallenge.ui.presentation.evenItemsScreen.TotalPriceText
 import com.karam.mobilechallenge.ui.theme.AppSpacing
 
-/**
- * Main composable for the Categories List Screen.
- * Displays a list of categories, total price, and handles user interactions.
- *
- * @param viewModel The ViewModel that manages the state and business logic for this screen.
- * @param innerPadding Padding to be applied to the main content.
- * @param onCategorySelected Callback for when a category is selected.
- * @param onSavedEventsClick Callback for when the save button is clicked.
- */
 @Composable
 fun CategoriesListScreen(
     viewModel: CategoriesViewModel,
@@ -47,7 +37,6 @@ fun CategoriesListScreen(
 ) {
     val state by viewModel.viewState.collectAsState()
 
-    // Handle side effects (like navigation) from the ViewModel
     LaunchedEffect(Unit) {
         viewModel.categorySideEffects.collect { sideEffect ->
             when (sideEffect) {
@@ -78,17 +67,16 @@ fun CategoriesListScreen(
         TotalPriceText(totalPrice = state.totalPrice)
 
         CategoriesGrid(
-            viewModel,
             modifier = Modifier
                 .fillMaxWidth()
                 .weight(1f),
             categories = state.categories,
+            selectedItemsCounts = state.selectedItemsCounts,
             onCategoryClick = { category ->
                 viewModel.handleIntent(CategoriesIntent.OpenEventsItemsScreen(category))
             }
         )
 
-        // Display error message if available
         state.error?.let {
             ErrorText(it)
         }
@@ -106,12 +94,6 @@ fun CategoriesListScreen(
     }
 }
 
-/**
- * Composable for displaying hint text for adding events.
- *
- * @param text The text to display.
- * @param fontWeight The font weight for the text.
- */
 @Composable
 fun AddEventHintText(text: String, fontWeight: FontWeight) {
     Text(
@@ -122,9 +104,6 @@ fun AddEventHintText(text: String, fontWeight: FontWeight) {
     )
 }
 
-/**
- * Composable for displaying a loading indicator.
- */
 @Composable
 fun LoadingIndicator() {
     Box(
@@ -135,18 +114,11 @@ fun LoadingIndicator() {
     }
 }
 
-/**
- * Composable for displaying a grid of categories.
- *
- * @param modifier Modifier for styling and layout.
- * @param categories List of categories to display.
- * @param onCategoryClick Callback for when a category is clicked.
- */
 @Composable
 fun CategoriesGrid(
-    viewModel: CategoriesViewModel,
     modifier: Modifier,
     categories: List<Category>,
+    selectedItemsCounts: Map<Int, Int>,
     onCategoryClick: (Category) -> Unit
 ) {
     LazyVerticalGrid(
@@ -157,52 +129,20 @@ fun CategoriesGrid(
     ) {
         items(categories) { category ->
             CategoryCard(
-                viewModel,
                 category = category,
+                selectedItemsCount = selectedItemsCounts[category.id] ?: 0,
                 onClick = { onCategoryClick(category) }
             )
         }
     }
 }
 
-/**
- * Composable for displaying error text.
- *
- * @param message The error message to display.
- */
 @Composable
-fun ErrorText(message: String) {
-    Text(
-        text = message,
-        color = MaterialTheme.colorScheme.error
-    )
-}
-
-/**
- * Composable for the save button.
- *
- * @param modifier Modifier for styling and layout.
- * @param onSavedEventsClick Callback for when the button is clicked.
- */
-@Composable
-fun SaveButton(modifier: Modifier, onSavedEventsClick: () -> Unit) {
-    Button(
-        onClick = { onSavedEventsClick() },
-        modifier = modifier,
-        shape = RoundedCornerShape(AppSpacing.small)
-    ) {
-        Text(stringResource(R.string.save))
-    }
-}
-
-/**
- * Composable for displaying a single category card.
- *
- * @param category The category to display.
- * @param onClick Callback for when the card is clicked.
- */
-@Composable
-fun CategoryCard(viewModel: CategoriesViewModel, category: Category, onClick: () -> Unit) {
+fun CategoryCard(
+    category: Category,
+    selectedItemsCount: Int,
+    onClick: () -> Unit
+) {
     Card(
         modifier = Modifier
             .fillMaxWidth()
@@ -211,7 +151,6 @@ fun CategoryCard(viewModel: CategoriesViewModel, category: Category, onClick: ()
         elevation = CardDefaults.cardElevation(defaultElevation = AppSpacing.extraSmall)
     ) {
         Column {
-            // Image with overlay for Selected Couunt
             Box(
                 modifier = Modifier
                     .fillMaxWidth()
@@ -225,7 +164,7 @@ fun CategoryCard(viewModel: CategoriesViewModel, category: Category, onClick: ()
                 )
 
                 CircularText(
-                    text = viewModel.getCategoriesSelectedItemsCount(category.id).toString(),
+                    text = selectedItemsCount.toString(),
                     modifier = Modifier
                         .padding(AppSpacing.medium)
                         .align(Alignment.TopEnd)
@@ -241,12 +180,25 @@ fun CategoryCard(viewModel: CategoriesViewModel, category: Category, onClick: ()
     }
 }
 
-/**
- * Composable Draw Circle with text inside.
- *
- * @param text The text to display.
- * @param modifier modifier to add style.
- */
+@Composable
+fun ErrorText(message: String) {
+    Text(
+        text = message,
+        color = MaterialTheme.colorScheme.error
+    )
+}
+
+@Composable
+fun SaveButton(modifier: Modifier, onSavedEventsClick: () -> Unit) {
+    Button(
+        onClick = { onSavedEventsClick() },
+        modifier = modifier,
+        shape = RoundedCornerShape(AppSpacing.small)
+    ) {
+        Text(stringResource(R.string.save))
+    }
+}
+
 @Composable
 fun CircularText(
     text: String,
