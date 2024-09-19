@@ -9,4 +9,8 @@
     <string name="add_to_your_event_to_view_our_cost_estimate">Add to your event to view our cost estimate.</string>
     <string name="save">Save</string>
     <string name="event_builder">Event Builder</string>
+
+    <string name="error_fetching_items">An error occurred while fetching items</string>
+    <string name="error_toggling_item">An error occurred while toggling item selection</string>
+    <string name="an_unknown_error_occurred">An unknown error occurred</string>
 </resources>

@@ -6,16 +6,16 @@ import com.google.gson.annotations.SerializedName
 data class CategoryItems(
 
     @SerializedName("id")
-    val id:Int ,
+    val id: Int,
     @SerializedName("title")
-    val title:String,
+    val title: String,
     @SerializedName("image")
     val image: String,
     @SerializedName("minBudget")
-    val minBudget: Int,
+    val minBudget: Double,
     @SerializedName("maxBudget")
-    val maxBudget: Int,
+    val maxBudget: Double,
     @SerializedName("avgBudget")
-    val avgBudget: Int,
-    var isSelected: Boolean = false // Track selection status
+    val avgBudget: Double,
+    val isSelected: Boolean = false
 )

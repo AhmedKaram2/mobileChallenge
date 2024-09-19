@@ -1,8 +1,7 @@
-package com.karam.mobilechallenge.ui.presentation
+package com.karam.mobilechallenge.ui.presentation.evenItemsScreen
 
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
-import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
@@ -13,7 +12,7 @@ import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.lazy.grid.GridCells
 import androidx.compose.foundation.lazy.grid.LazyVerticalGrid
-import androidx.compose.foundation.lazy.grid.items
+import androidx.compose.foundation.lazy.grid.itemsIndexed
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.ArrowBack
 import androidx.compose.material3.Card
@@ -25,7 +24,6 @@ import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Text
 import androidx.compose.material3.TopAppBar
-import androidx.compose.material3.TopAppBarDefaults
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.collectAsState
@@ -39,108 +37,80 @@ import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.FontWeight
 import coil.compose.rememberAsyncImagePainter
 import com.karam.mobilechallenge.R
-import com.karam.mobilechallenge.contract.intent.CategoryItemsIntent
-import com.karam.mobilechallenge.contract.state.CategoryItemsState
+import com.karam.mobilechallenge.contract.intent.EventsItemsIntent
 import com.karam.mobilechallenge.data.model.Category
 import com.karam.mobilechallenge.data.model.CategoryItems
+import com.karam.mobilechallenge.ui.presentation.categoriesListScreen.AddEventHintText
+import com.karam.mobilechallenge.ui.presentation.categoriesListScreen.ErrorText
+import com.karam.mobilechallenge.ui.presentation.categoriesListScreen.LoadingIndicator
 import com.karam.mobilechallenge.ui.theme.AppSpacing
 import com.karam.mobilechallenge.ui.theme.Typography
-import com.karam.mobilechallenge.ui.viewmodel.CategoryItemsViewModel
 
 @OptIn(ExperimentalMaterial3Api::class)
 
 @Composable
-fun CategoryItemsListScreen(
-    viewModel: CategoryItemsViewModel,
+fun EventsItemsListScreen(
+    viewModel: EventsItemsViewModel,
     category: Category,
-    totalPrice: Double,
-    selectedItems: List<CategoryItems>,
-    onSelectedItemsChange: (List<CategoryItems>) -> Unit,
     onBackClick: () -> Unit
 ) {
-    val state by viewModel.state.collectAsState()
+    val state by viewModel.viewState.collectAsState()
 
-    LaunchedEffect(key1 = category) {
-        viewModel.setIntent(CategoryItemsIntent.FetchCategoryItemsFromAPI(category.id))
+    LaunchedEffect(category) {
+        viewModel.handleIntent(EventsItemsIntent.FetchCategoryItemsFromAPI(category.id))
     }
-
 
     Scaffold(
         topBar = {
             TopAppBar(
                 navigationIcon = {
                     IconButton(onClick = onBackClick) {
-                        Icon(
-                            Icons.Default.ArrowBack,
-                            contentDescription = stringResource(R.string.back)
-                        )
+                        Icon(Icons.Default.ArrowBack, contentDescription = stringResource(R.string.back))
                     }
                 },
                 title = {
-                    Box(
-                        modifier = Modifier.fillMaxSize(),
-                        contentAlignment = Alignment.Center
-                    ) {
-                        Text(
-                            text = category.title,
-                            style = MaterialTheme.typography.titleLarge,
-                            color = MaterialTheme.colorScheme.onPrimaryContainer
-                        )
-                    }
-                },
-                colors = TopAppBarDefaults.topAppBarColors(
-                    containerColor = Color.White,
-                    titleContentColor = MaterialTheme.colorScheme.onPrimaryContainer
-                )
+                    Text(text = category.title)
+                }
             )
         }
     ) { innerPadding ->
-        Column(
+        Box(
             modifier = Modifier
                 .fillMaxSize()
                 .padding(innerPadding)
                 .background(Color.White),
-            verticalArrangement = Arrangement.Center, // Center vertically
-            horizontalAlignment = Alignment.CenterHorizontally // Center horizontally
-
+            contentAlignment = Alignment.Center
         ) {
+            Column(
+                verticalArrangement = Arrangement.Center,
+                horizontalAlignment = Alignment.CenterHorizontally
+            ) {
+                AddEventHintText(
+                    stringResource(R.string.add_to_your_event_to_view_our_cost_estimate),
+                    FontWeight.Normal
+                )
 
-            // AddEventHintText composable
-            AddEventHintText(
-                stringResource(
-                    R.string.add_to_your_event_to_view_our_cost_estimate
-                ), FontWeight.Normal
-            )
+                TotalPriceText(totalPrice = state.totalPrice)
 
-            // Display total price
-            TotalPriceText(totalPrice = totalPrice)
-
-            when (state) {
-                is CategoryItemsState.Loading -> LoadingIndicator()
-                is CategoryItemsState.CategoryItemsLoaded -> {
-                    (state as CategoryItemsState.CategoryItemsLoaded).items?.let { items ->
-                        if (items.isEmpty()) {
-                            Text(stringResource(R.string.no_items_available))
-                        } else {
-                            ItemsGrid(
-                                modifier = Modifier
-                                    .fillMaxWidth()
-                                    .weight(1f),
-                                items = items,
-                                selectedItems = selectedItems,
-                                onItemSelected = { item ->
-                                    val newList = selectedItems.toMutableList()
-                                    if (newList.contains(item)) newList.remove(item)
-                                    else newList.add(item)
-                                    onSelectedItemsChange(newList)
-                                }
-                            )
-                        }
-                    }
+                state.items?.let { items ->
+                    ItemsGrid(
+                        modifier = Modifier
+                            .fillMaxWidth()
+                            .weight(1f),
+                        items = items,
+                        onItemCheckClick = { index ->
+                            viewModel.handleIntent(EventsItemsIntent.ItemCheckedClick(index))
+                        },
+                    )
                 }
+            }
 
-                is CategoryItemsState.Error -> ErrorText((state as CategoryItemsState.Error).message)
-                CategoryItemsState.Idle -> LoadingIndicator()
+            state.error?.let {
+                ErrorText(it)
+            }
+
+            if (state.isLoading) {
+                LoadingIndicator()
             }
         }
     }
@@ -160,8 +130,7 @@ fun TotalPriceText(totalPrice: Double) {
 fun ItemsGrid(
     modifier: Modifier,
     items: List<CategoryItems>,
-    selectedItems: List<CategoryItems>,
-    onItemSelected: (CategoryItems) -> Unit
+    onItemCheckClick: (Int) -> Unit
 ) {
     LazyVerticalGrid(
         columns = GridCells.Fixed(2),
@@ -169,9 +138,13 @@ fun ItemsGrid(
         verticalArrangement = Arrangement.spacedBy(AppSpacing.medium),
         modifier = modifier
     ) {
-        items(items) { item ->
-            val isSelected = selectedItems.contains(item)
-            CategoryItemCard(item, isSelected, onItemSelected)
+        itemsIndexed(items) { index, item ->
+            CategoryItemCard(
+                item = item,
+                onItemCheckClick = {
+                    onItemCheckClick(index)
+                }
+            )
         }
     }
 }
@@ -179,8 +152,7 @@ fun ItemsGrid(
 @Composable
 fun CategoryItemCard(
     item: CategoryItems,
-    isSelected: Boolean,
-    onItemSelected: (CategoryItems) -> Unit
+    onItemCheckClick: () -> Unit
 ) {
     Card(
         modifier = Modifier
@@ -188,14 +160,14 @@ fun CategoryItemCard(
             .aspectRatio(1f)
             .padding(AppSpacing.medium),
         elevation = CardDefaults.cardElevation(defaultElevation = AppSpacing.extraSmall),
-        onClick = { onItemSelected(item) }
+        onClick = onItemCheckClick
     ) {
         Column {
             // Image with overlay for selection icon
             Box(
                 modifier = Modifier
                     .fillMaxWidth()
-                    .weight(1f) // Ensures the image takes up most of the space
+                    .weight(1f)
             ) {
                 Image(
                     painter = rememberAsyncImagePainter(item.image),
@@ -210,7 +182,7 @@ fun CategoryItemCard(
                         .padding(AppSpacing.small),
                     contentAlignment = Alignment.TopEnd
                 ) {
-                    if (isSelected) {
+                    if (item.isSelected) {
                         Image(
                             painter = painterResource(id = R.drawable.item_added),
                             contentDescription = stringResource(R.string.selected),
@@ -240,9 +212,6 @@ fun CategoryItemCard(
         }
     }
 }
-
-
-
 
 
 

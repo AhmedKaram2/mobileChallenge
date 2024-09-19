@@ -1,4 +1,4 @@
-package com.karam.mobilechallenge.ui.presentation
+package com.karam.mobilechallenge.ui.presentation.categoriesListScreen
 
 
 import androidx.compose.foundation.Image
@@ -31,38 +31,30 @@ import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.FontWeight
-import androidx.compose.ui.unit.dp
 import coil.compose.rememberAsyncImagePainter
 import com.karam.mobilechallenge.R
 import com.karam.mobilechallenge.contract.intent.CategoriesIntent
 import com.karam.mobilechallenge.contract.sideEffects.CategorySideEffects
-import com.karam.mobilechallenge.contract.state.CategoriesState
 import com.karam.mobilechallenge.data.model.Category
+import com.karam.mobilechallenge.ui.presentation.evenItemsScreen.TotalPriceText
 import com.karam.mobilechallenge.ui.theme.AppSpacing
-import com.karam.mobilechallenge.ui.viewmodel.CategoriesViewModel
-import kotlinx.coroutines.flow.collectLatest
 
 @Composable
 fun CategoriesListScreen(
     viewModel: CategoriesViewModel,
     innerPadding: PaddingValues,
-    totalPrice: Double,
     onCategorySelected: (Category) -> Unit,
     onSavedEventsClick: () -> Unit
 ) {
-    val state by viewModel.state.collectAsState()
+    val state by viewModel.viewState.collectAsState()
 
-    LaunchedEffect(viewModel.categorySideEffects) {
-        viewModel.categorySideEffects.collectLatest {
-            when (it) {
-                is CategorySideEffects.OpenCategoriesItemsScreen -> onCategorySelected(it.category)
+    LaunchedEffect(Unit) {
+        viewModel.categorySideEffects.collect { sideEffect ->
+            when (sideEffect) {
+                is CategorySideEffects.OpenCategoriesItemsScreen -> onCategorySelected(sideEffect.category)
                 is CategorySideEffects.OpenSavedEventsScreen -> onSavedEventsClick()
             }
         }
-    }
-
-    LaunchedEffect(Unit) {
-        viewModel.setIntent(CategoriesIntent.FetchCategoriesFromAPI())
     }
 
     Column(
@@ -73,39 +65,35 @@ fun CategoriesListScreen(
         verticalArrangement = Arrangement.Center,
         horizontalAlignment = Alignment.CenterHorizontally
     ) {
-
         AddEventHintText(
-            text = stringResource(R.string.event_builder), FontWeight.Bold
+            text = stringResource(R.string.event_builder),
+            FontWeight.Bold
         )
 
         AddEventHintText(
-            stringResource(R.string.add_to_your_event_to_view_our_cost_estimate), FontWeight.Normal
+            stringResource(R.string.add_to_your_event_to_view_our_cost_estimate),
+            FontWeight.Normal
         )
 
-        // Display the total price
-        TotalPriceText(totalPrice = totalPrice)
+        TotalPriceText(totalPrice = state.totalPrice)
 
-        when (state) {
-            is CategoriesState.Loading -> LoadingIndicator()
-            is CategoriesState.CategoriesLoaded -> {
-                (state as CategoriesState.CategoriesLoaded).categories?.let { categories ->
-                    if (categories.isEmpty()) {
-                        Text(stringResource(R.string.no_events_available))
-                    } else {
-                        CategoriesGrid(
-                            modifier = Modifier
-                                .fillMaxWidth()
-                                .weight(1f),
-                            categories = categories,
-                            viewModel = viewModel
-                        )
-                    }
-                }
+        CategoriesGrid(
+            modifier = Modifier
+                .fillMaxWidth()
+                .weight(1f),
+            categories = state.categories,
+            onCategoryClick = { category ->
+                viewModel.handleIntent(CategoriesIntent.OpenEventsItemsScreen(category))
             }
+        )
 
-            is CategoriesState.Error -> ErrorText((state as CategoriesState.Error).message)
-            else -> { /* Handle other states if needed */
-            }
+        // Display error message if available
+        state.error?.let {
+            ErrorText(it)
+        }
+
+        if (state.isLoading) {
+            LoadingIndicator()
         }
 
         SaveButton(
@@ -142,7 +130,9 @@ fun LoadingIndicator() {
 
 @Composable
 fun CategoriesGrid(
-    modifier: Modifier, categories: List<Category>?, viewModel: CategoriesViewModel
+    modifier: Modifier,
+    categories: List<Category>,
+    onCategoryClick: (Category) -> Unit
 ) {
     LazyVerticalGrid(
         columns = GridCells.Fixed(2),
@@ -150,10 +140,12 @@ fun CategoriesGrid(
         verticalArrangement = Arrangement.spacedBy(AppSpacing.medium),
         modifier = modifier
     ) {
-        items(categories ?: emptyList()) { category ->
+        items(categories) { category ->
             CategoryCard(
-                category,
-                viewModel = viewModel
+                category = category,
+
+                onClick = { onCategoryClick(category)
+                }
             )
         }
     }
@@ -179,14 +171,12 @@ fun SaveButton(modifier: Modifier, onSavedEventsClick: () -> Unit) {
 }
 
 @Composable
-fun CategoryCard(category: Category, viewModel: CategoriesViewModel) {
+fun CategoryCard(category: Category, onClick: () -> Unit) {
     Card(
         modifier = Modifier
             .fillMaxWidth()
             .aspectRatio(1f)
-            .clickable {
-                viewModel.setIntent(CategoriesIntent.OpenEventsItemsScreen(category))
-            },
+            .clickable(onClick = onClick),
         elevation = CardDefaults.cardElevation(defaultElevation = AppSpacing.extraSmall)
     ) {
         Column {

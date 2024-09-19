@@ -1,4 +1,4 @@
-package com.karam.mobilechallenge.ui.presentation
+package com.karam.mobilechallenge.ui.presentation.eventSavedScreen
 
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Arrangement
@@ -6,7 +6,6 @@ import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.height
-import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.material.icons.Icons
@@ -20,15 +19,12 @@ import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
-import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import com.karam.mobilechallenge.ui.theme.AppSpacing
 
 
 @Composable
-fun EventSavedScreen(
-    totalPrice: Double
-) {
+fun EventSavedScreen() {
     Column(
         modifier = Modifier
             .fillMaxSize()
@@ -52,7 +48,7 @@ fun EventSavedScreen(
                 )
                 Spacer(modifier = Modifier.height(8.dp))
                 Text(
-                    text = totalPrice.toString(),
+                    text = "", // TODO: get from view model
                     style = MaterialTheme.typography.headlineLarge
                 )
                 Spacer(modifier = Modifier.height(AppSpacing.small))
