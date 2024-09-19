@@ -16,15 +16,24 @@ import androidx.compose.material3.Icon
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.collectAsState
+import androidx.compose.runtime.getValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.unit.dp
+import com.karam.mobilechallenge.R
 import com.karam.mobilechallenge.ui.theme.AppSpacing
 
 
 @Composable
-fun EventSavedScreen() {
+fun EventSavedScreen(
+    viewModel: EventSavedViewModel
+) {
+    val state by viewModel.viewState.collectAsState()
+
+
     Column(
         modifier = Modifier
             .fillMaxSize()
@@ -43,18 +52,18 @@ fun EventSavedScreen() {
                 horizontalAlignment = Alignment.CenterHorizontally
             ) {
                 Text(
-                    text = "Event Saved!",
+                    text = stringResource(R.string.event_saved),
                     style = MaterialTheme.typography.titleLarge
                 )
                 Spacer(modifier = Modifier.height(8.dp))
                 Text(
-                    text = "", // TODO: get from view model
+                    text = state.toString(),
                     style = MaterialTheme.typography.headlineLarge
                 )
                 Spacer(modifier = Modifier.height(AppSpacing.small))
                 Icon(
                     imageVector = Icons.Filled.Star,
-                    contentDescription = "Star",
+                    contentDescription = stringResource(R.string.star),
                     modifier = Modifier.size(32.dp)
                 )
             }

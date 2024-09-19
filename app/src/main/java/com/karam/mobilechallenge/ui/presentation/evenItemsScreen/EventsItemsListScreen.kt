@@ -2,32 +2,14 @@ package com.karam.mobilechallenge.ui.presentation.evenItemsScreen
 
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
-import androidx.compose.foundation.layout.Arrangement
-import androidx.compose.foundation.layout.Box
-import androidx.compose.foundation.layout.Column
-import androidx.compose.foundation.layout.aspectRatio
-import androidx.compose.foundation.layout.fillMaxSize
-import androidx.compose.foundation.layout.fillMaxWidth
-import androidx.compose.foundation.layout.padding
-import androidx.compose.foundation.layout.size
+import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.lazy.grid.GridCells
 import androidx.compose.foundation.lazy.grid.LazyVerticalGrid
 import androidx.compose.foundation.lazy.grid.itemsIndexed
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.ArrowBack
-import androidx.compose.material3.Card
-import androidx.compose.material3.CardDefaults
-import androidx.compose.material3.ExperimentalMaterial3Api
-import androidx.compose.material3.Icon
-import androidx.compose.material3.IconButton
-import androidx.compose.material3.MaterialTheme
-import androidx.compose.material3.Scaffold
-import androidx.compose.material3.Text
-import androidx.compose.material3.TopAppBar
-import androidx.compose.runtime.Composable
-import androidx.compose.runtime.LaunchedEffect
-import androidx.compose.runtime.collectAsState
-import androidx.compose.runtime.getValue
+import androidx.compose.material3.*
+import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
@@ -40,14 +22,18 @@ import com.karam.mobilechallenge.R
 import com.karam.mobilechallenge.contract.intent.EventsItemsIntent
 import com.karam.mobilechallenge.data.model.Category
 import com.karam.mobilechallenge.data.model.CategoryItems
-import com.karam.mobilechallenge.ui.presentation.categoriesListScreen.AddEventHintText
-import com.karam.mobilechallenge.ui.presentation.categoriesListScreen.ErrorText
-import com.karam.mobilechallenge.ui.presentation.categoriesListScreen.LoadingIndicator
+import com.karam.mobilechallenge.ui.presentation.categoriesListScreen.*
 import com.karam.mobilechallenge.ui.theme.AppSpacing
 import com.karam.mobilechallenge.ui.theme.Typography
 
-@OptIn(ExperimentalMaterial3Api::class)
-
+/**
+ * Main composable for the Events Items List Screen.
+ * Displays a list of items for a specific category and handles user interactions.
+ *
+ * @param viewModel The ViewModel that manages the state and business logic for this screen.
+ * @param category The selected category for which items are displayed.
+ * @param onBackClick Callback for when the back button is clicked.
+ */
 @Composable
 fun EventsItemsListScreen(
     viewModel: EventsItemsViewModel,
@@ -62,15 +48,9 @@ fun EventsItemsListScreen(
 
     Scaffold(
         topBar = {
-            TopAppBar(
-                navigationIcon = {
-                    IconButton(onClick = onBackClick) {
-                        Icon(Icons.Default.ArrowBack, contentDescription = stringResource(R.string.back))
-                    }
-                },
-                title = {
-                    Text(text = category.title)
-                }
+            CenteredTitleTopAppBar(
+                title = category.title,
+                onBackClick = onBackClick
             )
         }
     ) { innerPadding ->
@@ -116,6 +96,11 @@ fun EventsItemsListScreen(
     }
 }
 
+/**
+ * Composable for displaying the total price.
+ *
+ * @param totalPrice The total price to display.
+ */
 @Composable
 fun TotalPriceText(totalPrice: Double) {
     Text(
@@ -126,6 +111,13 @@ fun TotalPriceText(totalPrice: Double) {
     )
 }
 
+/**
+ * Composable for displaying a grid of category items.
+ *
+ * @param modifier Modifier for styling and layout.
+ * @param items List of category items to display.
+ * @param onItemCheckClick Callback for when an item is clicked.
+ */
 @Composable
 fun ItemsGrid(
     modifier: Modifier,
@@ -149,6 +141,12 @@ fun ItemsGrid(
     }
 }
 
+/**
+ * Composable for displaying a single category item card.
+ *
+ * @param item The category item to display.
+ * @param onItemCheckClick Callback for when the item is clicked.
+ */
 @Composable
 fun CategoryItemCard(
     item: CategoryItems,
@@ -213,5 +211,45 @@ fun CategoryItemCard(
     }
 }
 
-
-
+/**
+ * Composable for the top app bar with a centered title.
+ *
+ * @param title The title to display in the app bar.
+ * @param onBackClick Callback for when the back button is clicked.
+ * @param modifier Modifier for styling and layout.
+ */
+@OptIn(ExperimentalMaterial3Api::class)
+@Composable
+fun CenteredTitleTopAppBar(
+    title: String,
+    onBackClick: () -> Unit,
+    modifier: Modifier = Modifier
+) {
+    TopAppBar(
+        title = {
+            Box(
+                modifier = Modifier.fillMaxWidth(),
+                contentAlignment = Alignment.Center
+            ) {
+                Text(
+                    text = title,
+                    style = MaterialTheme.typography.titleLarge,
+                    color = MaterialTheme.colorScheme.onSurface
+                )
+            }
+        },
+        navigationIcon = {
+            IconButton(onClick = onBackClick) {
+                Icon(
+                    imageVector = Icons.Default.ArrowBack,
+                    contentDescription = stringResource(R.string.back),
+                    tint = MaterialTheme.colorScheme.onSurface
+                )
+            }
+        },
+        colors = TopAppBarDefaults.topAppBarColors(
+            containerColor = Color.White
+        ),
+        modifier = modifier
+    )
+}

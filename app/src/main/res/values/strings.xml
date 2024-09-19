@@ -13,4 +13,6 @@
     <string name="error_fetching_items">An error occurred while fetching items</string>
     <string name="error_toggling_item">An error occurred while toggling item selection</string>
     <string name="an_unknown_error_occurred">An unknown error occurred</string>
+    <string name="event_saved">Event Saved!</string>
+    <string name="star">Star</string>
 </resources>

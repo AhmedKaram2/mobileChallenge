@@ -1,26 +1,13 @@
 package com.karam.mobilechallenge.ui.presentation.categoriesListScreen
 
-
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.clickable
-import androidx.compose.foundation.layout.Arrangement
-import androidx.compose.foundation.layout.Box
-import androidx.compose.foundation.layout.Column
-import androidx.compose.foundation.layout.PaddingValues
-import androidx.compose.foundation.layout.aspectRatio
-import androidx.compose.foundation.layout.fillMaxSize
-import androidx.compose.foundation.layout.fillMaxWidth
-import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.lazy.grid.GridCells
 import androidx.compose.foundation.lazy.grid.LazyVerticalGrid
 import androidx.compose.foundation.lazy.grid.items
 import androidx.compose.foundation.shape.RoundedCornerShape
-import androidx.compose.material3.Button
-import androidx.compose.material3.Card
-import androidx.compose.material3.CardDefaults
-import androidx.compose.material3.CircularProgressIndicator
-import androidx.compose.material3.MaterialTheme
-import androidx.compose.material3.Text
+import androidx.compose.material3.*
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.collectAsState
@@ -39,6 +26,15 @@ import com.karam.mobilechallenge.data.model.Category
 import com.karam.mobilechallenge.ui.presentation.evenItemsScreen.TotalPriceText
 import com.karam.mobilechallenge.ui.theme.AppSpacing
 
+/**
+ * Main composable for the Categories List Screen.
+ * Displays a list of categories, total price, and handles user interactions.
+ *
+ * @param viewModel The ViewModel that manages the state and business logic for this screen.
+ * @param innerPadding Padding to be applied to the main content.
+ * @param onCategorySelected Callback for when a category is selected.
+ * @param onSavedEventsClick Callback for when the save button is clicked.
+ */
 @Composable
 fun CategoriesListScreen(
     viewModel: CategoriesViewModel,
@@ -48,6 +44,7 @@ fun CategoriesListScreen(
 ) {
     val state by viewModel.viewState.collectAsState()
 
+    // Handle side effects (like navigation) from the ViewModel
     LaunchedEffect(Unit) {
         viewModel.categorySideEffects.collect { sideEffect ->
             when (sideEffect) {
@@ -105,29 +102,42 @@ fun CategoriesListScreen(
     }
 }
 
+/**
+ * Composable for displaying hint text for adding events.
+ *
+ * @param text The text to display.
+ * @param fontWeight The font weight for the text.
+ */
 @Composable
 fun AddEventHintText(text: String, fontWeight: FontWeight) {
     Text(
         text = text,
         style = MaterialTheme.typography.titleLarge.copy(fontWeight = fontWeight),
         color = Color.Black,
-        modifier = Modifier
-            .padding(bottom = AppSpacing.medium)
-
+        modifier = Modifier.padding(bottom = AppSpacing.medium)
     )
 }
 
+/**
+ * Composable for displaying a loading indicator.
+ */
 @Composable
 fun LoadingIndicator() {
     Box(
-        modifier = Modifier
-            .fillMaxSize(), // Ensures Box fills available space
-        contentAlignment = Alignment.Center // Centers the content inside the Box
+        modifier = Modifier.fillMaxSize(),
+        contentAlignment = Alignment.Center
     ) {
         CircularProgressIndicator()
     }
 }
 
+/**
+ * Composable for displaying a grid of categories.
+ *
+ * @param modifier Modifier for styling and layout.
+ * @param categories List of categories to display.
+ * @param onCategoryClick Callback for when a category is clicked.
+ */
 @Composable
 fun CategoriesGrid(
     modifier: Modifier,
@@ -143,14 +153,17 @@ fun CategoriesGrid(
         items(categories) { category ->
             CategoryCard(
                 category = category,
-
-                onClick = { onCategoryClick(category)
-                }
+                onClick = { onCategoryClick(category) }
             )
         }
     }
 }
 
+/**
+ * Composable for displaying error text.
+ *
+ * @param message The error message to display.
+ */
 @Composable
 fun ErrorText(message: String) {
     Text(
@@ -159,6 +172,12 @@ fun ErrorText(message: String) {
     )
 }
 
+/**
+ * Composable for the save button.
+ *
+ * @param modifier Modifier for styling and layout.
+ * @param onSavedEventsClick Callback for when the button is clicked.
+ */
 @Composable
 fun SaveButton(modifier: Modifier, onSavedEventsClick: () -> Unit) {
     Button(
@@ -170,6 +189,12 @@ fun SaveButton(modifier: Modifier, onSavedEventsClick: () -> Unit) {
     }
 }
 
+/**
+ * Composable for displaying a single category card.
+ *
+ * @param category The category to display.
+ * @param onClick Callback for when the card is clicked.
+ */
 @Composable
 fun CategoryCard(category: Category, onClick: () -> Unit) {
     Card(

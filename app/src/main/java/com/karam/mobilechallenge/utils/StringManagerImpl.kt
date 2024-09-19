@@ -1,6 +1,5 @@
 package com.karam.mobilechallenge.utils
 
-// StringManagerImpl.kt
 import android.content.Context
 import androidx.annotation.StringRes
 
