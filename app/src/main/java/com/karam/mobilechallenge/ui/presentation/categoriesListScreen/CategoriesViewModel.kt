@@ -3,11 +3,11 @@ package com.karam.mobilechallenge.ui.presentation.categoriesListScreen
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.karam.mobilechallenge.R
-import com.karam.mobilechallenge.contract.intent.CategoriesIntent
-import com.karam.mobilechallenge.contract.sideEffects.CategorySideEffects
-import com.karam.mobilechallenge.contract.state.CategoriesState
+import com.karam.mobilechallenge.ui.contract.intent.CategoriesIntent
+import com.karam.mobilechallenge.ui.contract.sideEffects.CategorySideEffects
+import com.karam.mobilechallenge.ui.contract.state.CategoriesState
 import com.karam.mobilechallenge.data.model.Category
-import com.karam.mobilechallenge.repository.CategoriesRepository
+import com.karam.mobilechallenge.data.repository.CategoriesRepository
 import com.karam.mobilechallenge.utils.StringManager
 import kotlinx.coroutines.flow.*
 import kotlinx.coroutines.launch
@@ -24,11 +24,9 @@ class CategoriesViewModel(
     private val stringManager: StringManager
 ) : ViewModel() {
 
-    // Flow for emitting side effects (like navigation events)
     private val _categorySideEffects = MutableSharedFlow<CategorySideEffects>()
     val categorySideEffects = _categorySideEffects.asSharedFlow()
 
-    // State flows for managing loading and error states
     private val _isLoading = MutableStateFlow(false)
     private val _error = MutableStateFlow<String?>(null)
 

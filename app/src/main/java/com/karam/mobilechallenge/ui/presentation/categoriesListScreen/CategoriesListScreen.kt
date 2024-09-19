@@ -23,8 +23,8 @@ import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.sp
 import coil.compose.rememberAsyncImagePainter
 import com.karam.mobilechallenge.R
-import com.karam.mobilechallenge.contract.intent.CategoriesIntent
-import com.karam.mobilechallenge.contract.sideEffects.CategorySideEffects
+import com.karam.mobilechallenge.ui.contract.intent.CategoriesIntent
+import com.karam.mobilechallenge.ui.contract.sideEffects.CategorySideEffects
 import com.karam.mobilechallenge.data.model.Category
 import com.karam.mobilechallenge.ui.presentation.evenItemsScreen.TotalPriceText
 import com.karam.mobilechallenge.ui.theme.AppSpacing

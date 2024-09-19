@@ -1,4 +1,4 @@
-package com.karam.mobilechallenge.contract.sideEffects
+package com.karam.mobilechallenge.ui.contract.sideEffects
 
 import com.karam.mobilechallenge.data.model.Category
 

@@ -1,4 +1,4 @@
-package com.karam.mobilechallenge.contract.intent
+package com.karam.mobilechallenge.ui.contract.intent
 
 sealed class EventsItemsIntent {
     data class FetchCategoryItemsFromAPI(val categoryId: Int) : EventsItemsIntent()

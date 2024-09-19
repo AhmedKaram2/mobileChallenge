@@ -1,4 +1,4 @@
-package com.karam.mobilechallenge.repository
+package com.karam.mobilechallenge.data.repository
 
 import com.karam.mobilechallenge.data.api.CategoriesApi
 import com.karam.mobilechallenge.data.model.Category
@@ -16,15 +16,12 @@ import kotlinx.coroutines.flow.update
 class CategoriesRepository(
     private val categoriesApi: CategoriesApi,
 ) {
-    // StateFlow to hold and emit the list of categories
     private val _categoriesFlow = MutableStateFlow<List<Category>>(emptyList())
     val categoriesFlow: StateFlow<List<Category>> = _categoriesFlow
 
-    // StateFlow to hold and emit a map of category IDs to their respective items
     private val _itemsFlow = MutableStateFlow<Map<Int, List<CategoryItems>>>(emptyMap())
     val itemsFlow: StateFlow<Map<Int, List<CategoryItems>>> = _itemsFlow
 
-    // StateFlow to hold and emit the total price of selected items
     private val _totalPriceFlow = MutableStateFlow(0.0)
     val totalPriceFlow: StateFlow<Double> = _totalPriceFlow
 

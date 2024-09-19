@@ -19,7 +19,7 @@ import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.FontWeight
 import coil.compose.rememberAsyncImagePainter
 import com.karam.mobilechallenge.R
-import com.karam.mobilechallenge.contract.intent.EventsItemsIntent
+import com.karam.mobilechallenge.ui.contract.intent.EventsItemsIntent
 import com.karam.mobilechallenge.data.model.Category
 import com.karam.mobilechallenge.data.model.CategoryItems
 import com.karam.mobilechallenge.ui.presentation.categoriesListScreen.*

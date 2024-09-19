@@ -1,4 +1,4 @@
-package com.karam.mobilechallenge.contract.state
+package com.karam.mobilechallenge.ui.contract.state
 
 import com.karam.mobilechallenge.data.model.Category
 

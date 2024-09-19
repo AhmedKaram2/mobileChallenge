@@ -1,4 +1,4 @@
-package com.karam.mobilechallenge.contract.intent
+package com.karam.mobilechallenge.ui.contract.intent
 
 import com.karam.mobilechallenge.data.model.Category
 

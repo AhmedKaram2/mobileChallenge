@@ -3,9 +3,9 @@ package com.karam.mobilechallenge.ui.presentation.evenItemsScreen
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.karam.mobilechallenge.R
-import com.karam.mobilechallenge.contract.intent.EventsItemsIntent
-import com.karam.mobilechallenge.contract.state.EventsItemsState
-import com.karam.mobilechallenge.repository.CategoriesRepository
+import com.karam.mobilechallenge.ui.contract.intent.EventsItemsIntent
+import com.karam.mobilechallenge.ui.contract.state.EventsItemsState
+import com.karam.mobilechallenge.data.repository.CategoriesRepository
 import com.karam.mobilechallenge.utils.StringManager
 import kotlinx.coroutines.flow.*
 import kotlinx.coroutines.launch
@@ -22,7 +22,6 @@ class EventsItemsViewModel(
     private val stringManager: StringManager
 ) : ViewModel() {
 
-    // State flows for managing the current category ID, loading state, and error state
     private val _categoryId = MutableStateFlow<Int?>(null)
     private val _isLoading = MutableStateFlow(false)
     private val _error = MutableStateFlow<String?>(null)
