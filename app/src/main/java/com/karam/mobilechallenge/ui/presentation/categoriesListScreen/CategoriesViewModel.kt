@@ -90,6 +90,13 @@ class CategoriesViewModel(
     }
 
     /**
+     * Get The count of selected items for a specific category.
+     */
+    fun getCategoriesSelectedItemsCount(categoryId: Int): Int {
+        return categoriesRepository.getCategoriesSelectedItemsCount(categoryId)
+    }
+
+    /**
      * Emits a side effect to open the events items screen for a specific category.
      *
      * @param category The category to open the events items screen for.

@@ -33,7 +33,6 @@ fun EventSavedScreen(
 ) {
     val state by viewModel.viewState.collectAsState()
 
-
     Column(
         modifier = Modifier
             .fillMaxSize()
@@ -55,7 +54,7 @@ fun EventSavedScreen(
                     text = stringResource(R.string.event_saved),
                     style = MaterialTheme.typography.titleLarge
                 )
-                Spacer(modifier = Modifier.height(8.dp))
+                Spacer(modifier = Modifier.height(AppSpacing.small))
                 Text(
                     text = state.toString(),
                     style = MaterialTheme.typography.headlineLarge
@@ -64,15 +63,9 @@ fun EventSavedScreen(
                 Icon(
                     imageVector = Icons.Filled.Star,
                     contentDescription = stringResource(R.string.star),
-                    modifier = Modifier.size(32.dp)
+                    modifier = Modifier.size(AppSpacing.extraLarge)
                 )
             }
         }
     }
 }
-
-//@Preview
-//@Composable
-//fun PreviewEventSavedScreen() {
-//    EventSavedScreen(23030.030)
-//}

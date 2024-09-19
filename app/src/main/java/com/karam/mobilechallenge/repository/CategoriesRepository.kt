@@ -87,4 +87,14 @@ class CategoriesRepository(
             .sumOf { it.avgBudget }
         _totalPriceFlow.value = newTotalPrice
     }
+
+    /**
+     * Gets the count of selected items for a specific category.
+     *
+     * @param categoryId The ID of the category to count selected items for.
+     * @return The number of selected items in the specified category.
+     */
+    fun getCategoriesSelectedItemsCount(categoryId: Int): Int {
+        return _itemsFlow.value[categoryId]?.count { it.isSelected } ?: 0
+    }
 }

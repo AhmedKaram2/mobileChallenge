@@ -6,6 +6,7 @@ import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.lazy.grid.GridCells
 import androidx.compose.foundation.lazy.grid.LazyVerticalGrid
 import androidx.compose.foundation.lazy.grid.items
+import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material3.*
 import androidx.compose.runtime.Composable
@@ -16,8 +17,10 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.layout.ContentScale
+import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.FontWeight
+import androidx.compose.ui.unit.sp
 import coil.compose.rememberAsyncImagePainter
 import com.karam.mobilechallenge.R
 import com.karam.mobilechallenge.contract.intent.CategoriesIntent
@@ -75,6 +78,7 @@ fun CategoriesListScreen(
         TotalPriceText(totalPrice = state.totalPrice)
 
         CategoriesGrid(
+            viewModel,
             modifier = Modifier
                 .fillMaxWidth()
                 .weight(1f),
@@ -140,6 +144,7 @@ fun LoadingIndicator() {
  */
 @Composable
 fun CategoriesGrid(
+    viewModel: CategoriesViewModel,
     modifier: Modifier,
     categories: List<Category>,
     onCategoryClick: (Category) -> Unit
@@ -152,6 +157,7 @@ fun CategoriesGrid(
     ) {
         items(categories) { category ->
             CategoryCard(
+                viewModel,
                 category = category,
                 onClick = { onCategoryClick(category) }
             )
@@ -196,7 +202,7 @@ fun SaveButton(modifier: Modifier, onSavedEventsClick: () -> Unit) {
  * @param onClick Callback for when the card is clicked.
  */
 @Composable
-fun CategoryCard(category: Category, onClick: () -> Unit) {
+fun CategoryCard(viewModel: CategoriesViewModel, category: Category, onClick: () -> Unit) {
     Card(
         modifier = Modifier
             .fillMaxWidth()
@@ -205,18 +211,58 @@ fun CategoryCard(category: Category, onClick: () -> Unit) {
         elevation = CardDefaults.cardElevation(defaultElevation = AppSpacing.extraSmall)
     ) {
         Column {
-            Image(
-                painter = rememberAsyncImagePainter(category.image),
-                contentDescription = null,
+            // Image with overlay for Selected Couunt
+            Box(
                 modifier = Modifier
                     .fillMaxWidth()
-                    .weight(1f),
-                contentScale = ContentScale.Crop
-            )
+                    .weight(1f)
+            ) {
+                Image(
+                    painter = rememberAsyncImagePainter(category.image),
+                    contentDescription = null,
+                    modifier = Modifier.fillMaxSize(),
+                    contentScale = ContentScale.Crop
+                )
+
+                CircularText(
+                    text = viewModel.getCategoriesSelectedItemsCount(category.id).toString(),
+                    modifier = Modifier
+                        .padding(AppSpacing.medium)
+                        .align(Alignment.TopEnd)
+                        .size(AppSpacing.large)
+                )
+            }
             Text(
                 text = category.title,
                 modifier = Modifier.padding(AppSpacing.small),
                 style = MaterialTheme.typography.titleMedium
+            )
+        }
+    }
+}
+
+/**
+ * Composable Draw Circle with text inside.
+ *
+ * @param text The text to display.
+ * @param modifier modifier to add style.
+ */
+@Composable
+fun CircularText(
+    text: String,
+    modifier: Modifier = Modifier,
+) {
+    Surface(
+        modifier = modifier,
+        shape = CircleShape,
+        color = MaterialTheme.colorScheme.primary
+    ) {
+        Box(contentAlignment = Alignment.Center) {
+            Text(
+                text = text,
+                color = MaterialTheme.colorScheme.onPrimary,
+                fontSize = (AppSpacing.large.value / 2).sp,
+                fontWeight = FontWeight.Bold
             )
         }
     }
